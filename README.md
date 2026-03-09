@@ -10,8 +10,6 @@
   <a href="https://github.com/tobiasdotrip/putain"><img src="https://img.shields.io/github/stars/tobiasdotrip/putain?style=social" alt="GitHub stars"></a>
 </p>
 
-# putain
-
 A fast, funny French shell command corrector. Like [thefuck](https://github.com/nvbn/thefuck), but en français.
 
 ```
