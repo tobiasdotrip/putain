@@ -1,6 +1,14 @@
 use crate::rules::{Correction, Rule};
 use crate::shell::CommandContext;
 use regex::Regex;
+use std::sync::LazyLock;
+
+static RE_GIT_UPSTREAM: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"git push --set-upstream (\S+) (\S+)").unwrap());
+static RE_GIT_PATHSPEC: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"error: pathspec '([^']+)' did not match").unwrap());
+static RE_CMD_NOT_FOUND: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"command not found: (\S+)").unwrap());
 
 // --- Permission denied → sudo ---
 
@@ -34,8 +42,7 @@ impl Rule for GitPushUpstreamRule {
         if !ctx.command.starts_with("git push") {
             return None;
         }
-        let re = Regex::new(r"git push --set-upstream (\S+) (\S+)").ok()?;
-        if let Some(caps) = re.captures(&ctx.output) {
+        if let Some(caps) = RE_GIT_UPSTREAM.captures(&ctx.output) {
             let remote = caps.get(1)?.as_str();
             let branch = caps.get(2)?.as_str();
             Some(Correction {
@@ -44,7 +51,6 @@ impl Rule for GitPushUpstreamRule {
                 confidence: 0.95,
             })
         } else if ctx.output.contains("no upstream branch") {
-            // Fallback: try to get current branch
             let branch = std::process::Command::new("git")
                 .args(["branch", "--show-current"])
                 .output()
@@ -70,16 +76,16 @@ impl Rule for GitCheckoutNewBranchRule {
     fn name(&self) -> &str { "git_checkout_new_branch" }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
-        let re = Regex::new(r"error: pathspec '([^']+)' did not match").ok()?;
-        if ctx.command.starts_with("git checkout") {
-            if let Some(caps) = re.captures(&ctx.output) {
-                let branch = caps.get(1)?.as_str();
-                return Some(Correction {
-                    fixed_command: format!("git checkout -b {}", branch),
-                    rule_name: self.name().to_string(),
-                    confidence: 0.7,
-                });
-            }
+        if !ctx.command.starts_with("git checkout") {
+            return None;
+        }
+        if let Some(caps) = RE_GIT_PATHSPEC.captures(&ctx.output) {
+            let branch = caps.get(1)?.as_str();
+            return Some(Correction {
+                fixed_command: format!("git checkout -b {}", branch),
+                rule_name: self.name().to_string(),
+                confidence: 0.7,
+            });
         }
         None
     }
@@ -93,8 +99,7 @@ impl Rule for TypoCommandRule {
     fn name(&self) -> &str { "typo_command" }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
-        let re = Regex::new(r"command not found: (\S+)").ok()?;
-        let caps = re.captures(&ctx.output)?;
+        let caps = RE_CMD_NOT_FOUND.captures(&ctx.output)?;
         let typo = caps.get(1)?.as_str();
 
         let known_commands = [
@@ -133,7 +138,14 @@ impl Rule for TypoCommandRule {
         }
 
         let (suggestion, confidence) = best_match?;
-        let fixed = ctx.command.replacen(typo, &suggestion, 1);
+        // Replace only the first token (the command name), not arbitrary occurrences
+        let first_token = ctx.command.split_whitespace().next().unwrap_or("");
+        let fixed = if first_token == typo {
+            let rest = ctx.command.strip_prefix(typo).unwrap_or("");
+            format!("{}{}", suggestion, rest)
+        } else {
+            ctx.command.replacen(typo, &suggestion, 1)
+        };
         Some(Correction {
             fixed_command: fixed,
             rule_name: self.name().to_string(),

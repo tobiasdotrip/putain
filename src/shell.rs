@@ -58,22 +58,16 @@ impl CommandContext {
         })
     }
 
-    /// Build context by re-running the last command from shell history.
+    /// Build context from shell history (without re-executing the command).
     /// Fallback when env vars are not set (no hook mode).
+    /// Note: output will be empty since we don't re-run the command.
     pub fn from_history() -> Option<Self> {
         let shell = Shell::detect()?;
         let last_cmd = get_last_history_command(&shell)?;
-        let result = std::process::Command::new("sh")
-            .arg("-c")
-            .arg(&last_cmd)
-            .output()
-            .ok()?;
-        let output = String::from_utf8_lossy(&result.stderr).to_string()
-            + &String::from_utf8_lossy(&result.stdout);
         Some(CommandContext {
             command: last_cmd,
-            output,
-            exit_code: result.status.code().unwrap_or(1),
+            output: String::new(),
+            exit_code: 1,
             shell,
         })
     }
