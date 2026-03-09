@@ -1,9 +1,8 @@
-use assert_cmd::Command;
+use assert_cmd::cargo::cargo_bin_cmd;
 
 #[test]
 fn test_version_flag() {
-    Command::cargo_bin("putain")
-        .unwrap()
+    cargo_bin_cmd!("putain")
         .arg("--version")
         .assert()
         .success()
@@ -12,8 +11,7 @@ fn test_version_flag() {
 
 #[test]
 fn test_help_flag() {
-    Command::cargo_bin("putain")
-        .unwrap()
+    cargo_bin_cmd!("putain")
         .arg("--help")
         .assert()
         .success()
@@ -22,8 +20,7 @@ fn test_help_flag() {
 
 #[test]
 fn test_hook_bash_output() {
-    Command::cargo_bin("putain")
-        .unwrap()
+    cargo_bin_cmd!("putain")
         .args(["--hook", "bash"])
         .assert()
         .success()
@@ -32,8 +29,7 @@ fn test_hook_bash_output() {
 
 #[test]
 fn test_hook_zsh_output() {
-    Command::cargo_bin("putain")
-        .unwrap()
+    cargo_bin_cmd!("putain")
         .args(["--hook", "zsh"])
         .assert()
         .success()
