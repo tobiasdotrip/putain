@@ -1,0 +1,4 @@
+[[rule]]
+name = "sudo_env"
+output_pattern = "EACCES|Permission denied|permission denied"
+fix = "sudo {command}"

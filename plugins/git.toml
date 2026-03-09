@@ -1,0 +1,17 @@
+[[rule]]
+name = "git_add_all_typo"
+command = "git add"
+output_pattern = "did not match any files"
+fix = "git add ."
+
+[[rule]]
+name = "git_stash_pop_conflict"
+command = "git stash"
+output_pattern = "CONFLICT"
+fix = "git checkout --theirs . && git add . && git stash drop"
+
+[[rule]]
+name = "git_pull_rebase"
+command = "git pull"
+output_pattern = "divergent branches"
+fix = "git pull --rebase"

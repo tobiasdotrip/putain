@@ -1,0 +1,11 @@
+[[rule]]
+name = "docker_permission"
+command = "docker"
+output_pattern = "permission denied while trying to connect"
+fix = "sudo docker {last_arg}"
+
+[[rule]]
+name = "docker_not_running"
+command = "docker"
+output_pattern = "Cannot connect to the Docker daemon"
+fix = "open -a Docker && sleep 3 && {command}"
