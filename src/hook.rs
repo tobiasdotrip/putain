@@ -33,7 +33,8 @@ __putain_precmd() {
 }
 
 PROMPT_COMMAND="__putain_precmd;${PROMPT_COMMAND}"
-"#.to_string()
+"#
+    .to_string()
 }
 
 fn generate_zsh_hook() -> String {
@@ -61,7 +62,8 @@ __putain_precmd() {
 autoload -Uz add-zsh-hook
 add-zsh-hook preexec __putain_preexec
 add-zsh-hook precmd __putain_precmd
-"#.to_string()
+"#
+    .to_string()
 }
 
 fn generate_fish_hook() -> String {
@@ -81,13 +83,16 @@ function __putain_on_postexec --on-event fish_postexec
         set -e PUTAIN_EXIT_CODE
     end
 end
-"#.to_string()
+"#
+    .to_string()
 }
 
 pub fn install_instructions(shell: &Shell) -> String {
     match shell {
         Shell::Bash => "Ajoute à ~/.bashrc :\n  eval \"$(putain --hook bash)\"".to_string(),
         Shell::Zsh => "Ajoute à ~/.zshrc :\n  eval \"$(putain --hook zsh)\"".to_string(),
-        Shell::Fish => "Ajoute à ~/.config/fish/config.fish :\n  putain --hook fish | source".to_string(),
+        Shell::Fish => {
+            "Ajoute à ~/.config/fish/config.fish :\n  putain --hook fish | source".to_string()
+        }
     }
 }

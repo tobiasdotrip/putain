@@ -1,6 +1,6 @@
-use crate::rules::{all_builtin_rules, Correction, Rule};
-use crate::plugins;
 use crate::config::Config;
+use crate::plugins;
+use crate::rules::{all_builtin_rules, Correction, Rule};
 use crate::shell::CommandContext;
 
 pub struct Matcher {

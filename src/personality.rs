@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 
+#[derive(Default)]
 pub struct Personality {
     counters: HashMap<String, u32>,
 }
 
 impl Personality {
     pub fn new() -> Self {
-        Self {
-            counters: HashMap::new(),
-        }
+        Self::default()
     }
 
     pub fn react(&mut self, rule_name: &str) -> String {

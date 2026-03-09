@@ -20,7 +20,7 @@ command = "git push"
 output_pattern = "no upstream"
 fix = "git push --set-upstream origin main"
 "#;
-    let ruleset = TomlRuleSet::from_str(toml_str).unwrap();
+    let ruleset = toml_str.parse::<TomlRuleSet>().unwrap();
     assert_eq!(ruleset.rules.len(), 1);
 }
 
@@ -33,7 +33,7 @@ command = "npm"
 output_pattern = "Did you mean (.+)\\?"
 fix = "npm {1}"
 "#;
-    let ruleset = TomlRuleSet::from_str(toml_str).unwrap();
+    let ruleset = toml_str.parse::<TomlRuleSet>().unwrap();
     let ctx = make_ctx("npm isntall", "Did you mean install?");
     let correction = ruleset.rules[0].suggest(&ctx);
     assert!(correction.is_some());
@@ -49,7 +49,7 @@ command = "git push"
 output_pattern = "no upstream"
 fix = "git push --set-upstream origin main"
 "#;
-    let ruleset = TomlRuleSet::from_str(toml_str).unwrap();
+    let ruleset = toml_str.parse::<TomlRuleSet>().unwrap();
     let ctx = make_ctx("ls", "file1 file2");
     assert!(ruleset.rules[0].suggest(&ctx).is_none());
 }

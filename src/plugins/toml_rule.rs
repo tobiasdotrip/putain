@@ -21,8 +21,10 @@ pub struct TomlRule {
     pub fix: String,
 }
 
-impl TomlRuleSet {
-    pub fn from_str(s: &str) -> Result<Self, toml::de::Error> {
+impl std::str::FromStr for TomlRuleSet {
+    type Err = toml::de::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         toml::from_str(s)
     }
 }
@@ -58,7 +60,10 @@ impl Rule for TomlRule {
         }
 
         fixed = fixed.replace("{command}", &ctx.command);
-        fixed = fixed.replace("{last_arg}", ctx.command.split_whitespace().last().unwrap_or(""));
+        fixed = fixed.replace(
+            "{last_arg}",
+            ctx.command.split_whitespace().last().unwrap_or(""),
+        );
 
         if fixed.contains("{current_branch}") {
             let branch = std::process::Command::new("git")

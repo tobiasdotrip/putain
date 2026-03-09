@@ -11,20 +11,18 @@ pub fn load_plugins_from_dir(dir: &Path) -> Vec<Box<dyn Rule>> {
     };
     for entry in entries.flatten() {
         let path = entry.path();
-        if path.extension().map_or(false, |e| e == "toml") {
+        if path.extension().is_some_and(|e| e == "toml") {
             match std::fs::read_to_string(&path) {
-                Ok(content) => {
-                    match toml_rule::TomlRuleSet::from_str(&content) {
-                        Ok(ruleset) => {
-                            for rule in ruleset.rules {
-                                rules.push(Box::new(rule));
-                            }
-                        }
-                        Err(e) => {
-                            eprintln!("putain: erreur dans {}: {}", path.display(), e);
+                Ok(content) => match content.parse::<toml_rule::TomlRuleSet>() {
+                    Ok(ruleset) => {
+                        for rule in ruleset.rules {
+                            rules.push(Box::new(rule));
                         }
                     }
-                }
+                    Err(e) => {
+                        eprintln!("putain: erreur dans {}: {}", path.display(), e);
+                    }
+                },
                 Err(_) => continue,
             }
         }

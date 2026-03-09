@@ -39,7 +39,11 @@ fn main() {
             None => {
                 eprintln!(
                     "{}",
-                    format!("Shell inconnu: '{}'. Utilise bash, zsh ou fish.", shell_name).red()
+                    format!(
+                        "Shell inconnu: '{}'. Utilise bash, zsh ou fish.",
+                        shell_name
+                    )
+                    .red()
                 );
                 std::process::exit(1);
             }
@@ -77,7 +81,10 @@ fn main() {
             let reaction = personality.react(&correction.rule_name);
 
             eprintln!("{}", reaction.red().bold());
-            println!("{}", format!("→ {}", correction.fixed_command).green().bold());
+            println!(
+                "{}",
+                format!("→ {}", correction.fixed_command).green().bold()
+            );
 
             if cli.yes || cli.from_hook {
                 run_correction(&correction.fixed_command);
@@ -86,7 +93,12 @@ fn main() {
                 let mut input = String::new();
                 if std::io::stdin().read_line(&mut input).is_ok() {
                     let input = input.trim().to_lowercase();
-                    if input.is_empty() || input == "o" || input == "oui" || input == "y" || input == "yes" {
+                    if input.is_empty()
+                        || input == "o"
+                        || input == "oui"
+                        || input == "y"
+                        || input == "yes"
+                    {
                         run_correction(&correction.fixed_command);
                     }
                 }
@@ -111,7 +123,10 @@ fn run_correction(command: &str) {
     match status {
         Ok(s) => std::process::exit(s.code().unwrap_or(0)),
         Err(e) => {
-            eprintln!("{}", format!("Putain, même la correction a merdé: {}", e).red());
+            eprintln!(
+                "{}",
+                format!("Putain, même la correction a merdé: {}", e).red()
+            );
             std::process::exit(1);
         }
     }

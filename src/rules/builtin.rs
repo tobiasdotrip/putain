@@ -13,10 +13,17 @@ static RE_CMD_NOT_FOUND: LazyLock<Regex> =
 pub struct SudoRule;
 
 impl Rule for SudoRule {
-    fn name(&self) -> &str { "sudo" }
+    fn name(&self) -> &str {
+        "sudo"
+    }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
-        let patterns = ["Permission denied", "EACCES", "permission denied", "not permitted"];
+        let patterns = [
+            "Permission denied",
+            "EACCES",
+            "permission denied",
+            "not permitted",
+        ];
         if patterns.iter().any(|p| ctx.output.contains(p)) && !ctx.command.starts_with("sudo ") {
             Some(Correction {
                 fixed_command: format!("sudo {}", ctx.command),
@@ -32,7 +39,9 @@ impl Rule for SudoRule {
 pub struct GitPushUpstreamRule;
 
 impl Rule for GitPushUpstreamRule {
-    fn name(&self) -> &str { "git_push_upstream" }
+    fn name(&self) -> &str {
+        "git_push_upstream"
+    }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
         if !ctx.command.starts_with("git push") {
@@ -67,7 +76,9 @@ impl Rule for GitPushUpstreamRule {
 pub struct GitCheckoutNewBranchRule;
 
 impl Rule for GitCheckoutNewBranchRule {
-    fn name(&self) -> &str { "git_checkout_new_branch" }
+    fn name(&self) -> &str {
+        "git_checkout_new_branch"
+    }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
         if !ctx.command.starts_with("git checkout") {
@@ -88,26 +99,26 @@ impl Rule for GitCheckoutNewBranchRule {
 pub struct TypoCommandRule;
 
 impl Rule for TypoCommandRule {
-    fn name(&self) -> &str { "typo_command" }
+    fn name(&self) -> &str {
+        "typo_command"
+    }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
         let caps = RE_CMD_NOT_FOUND.captures(&ctx.output)?;
         let typo = caps.get(1)?.as_str();
 
         let known_commands = [
-            "git", "docker", "cargo", "npm", "pnpm", "yarn", "node", "python", "python3",
-            "pip", "pip3", "ruby", "go", "rustc", "rustup", "make", "cmake", "gcc", "g++",
-            "curl", "wget", "ssh", "scp", "rsync", "ls", "cd", "mv", "cp", "rm", "cat",
-            "grep", "find", "sed", "awk", "vim", "nano", "code", "brew", "apt", "dnf",
+            "git", "docker", "cargo", "npm", "pnpm", "yarn", "node", "python", "python3", "pip",
+            "pip3", "ruby", "go", "rustc", "rustup", "make", "cmake", "gcc", "g++", "curl", "wget",
+            "ssh", "scp", "rsync", "ls", "cd", "mv", "cp", "rm", "cat", "grep", "find", "sed",
+            "awk", "vim", "nano", "code", "brew", "apt", "dnf",
         ];
 
         let mut best_match: Option<(String, f64)> = None;
         for cmd in &known_commands {
             let dist = strsim::normalized_damerau_levenshtein(typo, cmd);
-            if dist > 0.6 {
-                if best_match.is_none() || dist > best_match.as_ref().unwrap().1 {
-                    best_match = Some((cmd.to_string(), dist));
-                }
+            if dist > 0.6 && (best_match.is_none() || dist > best_match.as_ref().unwrap().1) {
+                best_match = Some((cmd.to_string(), dist));
             }
         }
 
@@ -118,10 +129,10 @@ impl Rule for TypoCommandRule {
                         let name = entry.file_name();
                         let name = name.to_string_lossy();
                         let dist = strsim::normalized_damerau_levenshtein(typo, &name);
-                        if dist > 0.7 {
-                            if best_match.is_none() || dist > best_match.as_ref().unwrap().1 {
-                                best_match = Some((name.into_owned(), dist));
-                            }
+                        if dist > 0.7
+                            && (best_match.is_none() || dist > best_match.as_ref().unwrap().1)
+                        {
+                            best_match = Some((name.into_owned(), dist));
                         }
                     }
                 }
@@ -147,18 +158,27 @@ impl Rule for TypoCommandRule {
 pub struct CdTypoRule;
 
 impl Rule for CdTypoRule {
-    fn name(&self) -> &str { "cd_typo" }
+    fn name(&self) -> &str {
+        "cd_typo"
+    }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
         if !ctx.command.starts_with("cd ") {
             return None;
         }
-        if !ctx.output.contains("no such file or directory") && !ctx.output.contains("No such file") {
+        if !ctx.output.contains("no such file or directory") && !ctx.output.contains("No such file")
+        {
             return None;
         }
         let target = ctx.command.strip_prefix("cd ")?.trim();
-        let parent = std::path::Path::new(target).parent().unwrap_or(std::path::Path::new("."));
-        let dir_to_scan = if parent == std::path::Path::new("") { std::path::Path::new(".") } else { parent };
+        let parent = std::path::Path::new(target)
+            .parent()
+            .unwrap_or(std::path::Path::new("."));
+        let dir_to_scan = if parent == std::path::Path::new("") {
+            std::path::Path::new(".")
+        } else {
+            parent
+        };
         let filename = std::path::Path::new(target).file_name()?.to_string_lossy();
 
         let entries = std::fs::read_dir(dir_to_scan).ok()?;
@@ -169,7 +189,9 @@ impl Rule for CdTypoRule {
                 let name = name.to_string_lossy();
                 let dist = strsim::normalized_damerau_levenshtein(&filename, &name);
                 if dist > 0.5 && (best.is_none() || dist > best.as_ref().unwrap().1) {
-                    let full = if parent == std::path::Path::new("") || parent == std::path::Path::new(".") {
+                    let full = if parent == std::path::Path::new("")
+                        || parent == std::path::Path::new(".")
+                    {
                         name.to_string()
                     } else {
                         format!("{}/{}", parent.display(), name)
