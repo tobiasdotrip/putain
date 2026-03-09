@@ -25,11 +25,10 @@ impl Matcher {
     pub fn find_correction(&self, ctx: &CommandContext) -> Option<Correction> {
         let mut best: Option<Correction> = None;
         for rule in &self.rules {
-            if let Some(correction) = rule.suggest(ctx) {
-                if best.is_none() || correction.confidence > best.as_ref().unwrap().confidence {
+            if let Some(correction) = rule.suggest(ctx)
+                && (best.is_none() || correction.confidence > best.as_ref().unwrap().confidence) {
                     best = Some(correction);
                 }
-            }
         }
         best
     }

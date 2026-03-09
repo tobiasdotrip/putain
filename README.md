@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/tobiasdotrip/putain/actions/workflows/ci.yml"><img src="https://github.com/tobiasdotrip/putain/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/tobiasdotrip/putain/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
-  <a href="https://github.com/tobiasdotrip/putain"><img src="https://img.shields.io/badge/rust-2021-orange.svg" alt="Rust 2021"></a>
+  <a href="https://github.com/tobiasdotrip/putain"><img src="https://img.shields.io/badge/rust-2024-orange.svg" alt="Rust 2021"></a>
   <a href="https://github.com/tobiasdotrip/putain"><img src="https://img.shields.io/github/stars/tobiasdotrip/putain?style=social" alt="GitHub stars"></a>
 </p>
 
