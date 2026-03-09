@@ -33,14 +33,12 @@ impl Rule for TomlRule {
     }
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
-        // Check command prefix if specified
         if let Some(ref cmd) = self.command {
             if !ctx.command.starts_with(cmd.as_str()) {
                 return None;
             }
         }
 
-        // Check output pattern if specified
         let captures = if let Some(ref pattern) = self.output_pattern {
             let re = Regex::new(pattern).ok()?;
             let caps = re.captures(&ctx.output)?;
@@ -49,10 +47,8 @@ impl Rule for TomlRule {
             None
         };
 
-        // Build the fix
         let mut fixed = self.fix.clone();
 
-        // Replace numbered captures {1}, {2}, ...
         if let Some(ref caps) = captures {
             for i in 1..caps.len() {
                 if let Some(m) = caps.get(i) {
@@ -61,7 +57,6 @@ impl Rule for TomlRule {
             }
         }
 
-        // Replace built-in variables
         fixed = fixed.replace("{command}", &ctx.command);
         fixed = fixed.replace("{last_arg}", ctx.command.split_whitespace().last().unwrap_or(""));
 

@@ -20,7 +20,6 @@ impl Default for Config {
 impl Config {
     pub fn plugin_dirs_with_defaults(&self) -> Vec<PathBuf> {
         let mut dirs = self.plugin_dirs.clone();
-        // Built-in plugins shipped with the binary
         if let Ok(exe) = std::env::current_exe() {
             if let Some(parent) = exe.parent() {
                 let builtin = parent.join("plugins");
@@ -29,7 +28,6 @@ impl Config {
                 }
             }
         }
-        // User plugins: ~/.config/putain/plugins/
         if let Some(config_dir) = dirs::config_dir() {
             let user_plugins = config_dir.join("putain").join("plugins");
             if user_plugins.exists() {

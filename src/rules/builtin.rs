@@ -10,8 +10,6 @@ static RE_GIT_PATHSPEC: LazyLock<Regex> =
 static RE_CMD_NOT_FOUND: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"command not found: (\S+)").unwrap());
 
-// --- Permission denied → sudo ---
-
 pub struct SudoRule;
 
 impl Rule for SudoRule {
@@ -30,8 +28,6 @@ impl Rule for SudoRule {
         }
     }
 }
-
-// --- git push no upstream ---
 
 pub struct GitPushUpstreamRule;
 
@@ -68,8 +64,6 @@ impl Rule for GitPushUpstreamRule {
     }
 }
 
-// --- git checkout non-existent branch → -b ---
-
 pub struct GitCheckoutNewBranchRule;
 
 impl Rule for GitCheckoutNewBranchRule {
@@ -90,8 +84,6 @@ impl Rule for GitCheckoutNewBranchRule {
         None
     }
 }
-
-// --- command not found → typo suggestion ---
 
 pub struct TypoCommandRule;
 
@@ -119,7 +111,6 @@ impl Rule for TypoCommandRule {
             }
         }
 
-        // Also check PATH for real commands
         if let Ok(path_var) = std::env::var("PATH") {
             for dir in path_var.split(':') {
                 if let Ok(entries) = std::fs::read_dir(dir) {
@@ -138,7 +129,6 @@ impl Rule for TypoCommandRule {
         }
 
         let (suggestion, confidence) = best_match?;
-        // Replace only the first token (the command name), not arbitrary occurrences
         let first_token = ctx.command.split_whitespace().next().unwrap_or("");
         let fixed = if first_token == typo {
             let rest = ctx.command.strip_prefix(typo).unwrap_or("");
@@ -153,8 +143,6 @@ impl Rule for TypoCommandRule {
         })
     }
 }
-
-// --- cd to non-existent directory → fuzzy match ---
 
 pub struct CdTypoRule;
 

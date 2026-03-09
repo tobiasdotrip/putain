@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 pub struct Personality {
-    /// Tracks how many times each rule has been triggered
     counters: HashMap<String, u32>,
 }
 

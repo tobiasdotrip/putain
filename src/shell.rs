@@ -40,8 +40,7 @@ pub struct CommandContext {
 }
 
 impl CommandContext {
-    /// Build context from environment variables set by the shell hook.
-    /// PUTAIN_CMD, PUTAIN_OUTPUT, PUTAIN_EXIT_CODE
+    /// Reads PUTAIN_CMD, PUTAIN_OUTPUT, PUTAIN_EXIT_CODE env vars (set by shell hook).
     pub fn from_env() -> Option<Self> {
         let command = std::env::var("PUTAIN_CMD").ok()?;
         let output = std::env::var("PUTAIN_OUTPUT").unwrap_or_default();
@@ -58,9 +57,7 @@ impl CommandContext {
         })
     }
 
-    /// Build context from shell history (without re-executing the command).
-    /// Fallback when env vars are not set (no hook mode).
-    /// Note: output will be empty since we don't re-run the command.
+    /// Fallback: reads last command from shell history. Output will be empty.
     pub fn from_history() -> Option<Self> {
         let shell = Shell::detect()?;
         let last_cmd = get_last_history_command(&shell)?;

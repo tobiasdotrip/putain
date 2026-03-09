@@ -2,7 +2,6 @@ use crate::rules::{all_builtin_rules, Correction, Rule};
 use crate::plugins;
 use crate::config::Config;
 use crate::shell::CommandContext;
-use std::path::Path;
 
 pub struct Matcher {
     rules: Vec<Box<dyn Rule>>,
@@ -21,10 +20,6 @@ impl Matcher {
             rules.extend(plugins::load_plugins_from_dir(&dir));
         }
         Self { rules }
-    }
-
-    pub fn add_plugin_dir(&mut self, dir: &Path) {
-        self.rules.extend(plugins::load_plugins_from_dir(dir));
     }
 
     pub fn find_correction(&self, ctx: &CommandContext) -> Option<Correction> {
