@@ -1,0 +1,24 @@
+[package]
+name = "putain"
+version = "0.1.0"
+edition = "2021"
+description = "A fast, funny French shell command corrector. Like thefuck, but en français."
+license = "MIT"
+repository = "https://github.com/tobiasdotrip/putain"
+keywords = ["shell", "cli", "correction", "french"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+strsim = "0.11"
+colored = "2"
+dirs = "5"
+which = "7"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+tempfile = "3"
