@@ -1,5 +1,5 @@
-use putain::rules::builtin;
 use putain::rules::Rule;
+use putain::rules::builtin;
 use putain::shell::{CommandContext, Shell};
 
 fn make_ctx(command: &str, output: &str) -> CommandContext {

@@ -36,9 +36,10 @@ impl Rule for TomlRule {
 
     fn suggest(&self, ctx: &CommandContext) -> Option<Correction> {
         if let Some(ref cmd) = self.command
-            && !ctx.command.starts_with(cmd.as_str()) {
-                return None;
-            }
+            && !ctx.command.starts_with(cmd.as_str())
+        {
+            return None;
+        }
 
         let captures = if let Some(ref pattern) = self.output_pattern {
             let re = Regex::new(pattern).ok()?;

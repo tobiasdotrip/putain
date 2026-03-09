@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::plugins;
-use crate::rules::{all_builtin_rules, Correction, Rule};
+use crate::rules::{Correction, Rule, all_builtin_rules};
 use crate::shell::CommandContext;
 
 pub struct Matcher {
@@ -26,9 +26,10 @@ impl Matcher {
         let mut best: Option<Correction> = None;
         for rule in &self.rules {
             if let Some(correction) = rule.suggest(ctx)
-                && (best.is_none() || correction.confidence > best.as_ref().unwrap().confidence) {
-                    best = Some(correction);
-                }
+                && (best.is_none() || correction.confidence > best.as_ref().unwrap().confidence)
+            {
+                best = Some(correction);
+            }
         }
         best
     }
